@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuphead Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #1a0a00;
+      font-family: 'Georgia', serif;
+      color: #ffd040;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 32px;
+    }
+
+    h1 {
+      font-size: 24px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(255, 208, 64, 0.6);
+    }
+
+    .counter-display {
+      font-size: 72px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(255, 90, 31, 0.8), 2px 2px 0 #8b1a00;
+      line-height: 1;
+    }
+
+    .sub {
+      font-size: 18px;
+      color: #c87030;
+      letter-spacing: 2px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    button {
+      width: 64px;
+      height: 64px;
+      font-size: 32px;
+      font-weight: bold;
+      border: 3px solid #8b1a00;
+      border-radius: 8px;
+      background: #3a0d00;
+      color: #ffd040;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    button:hover { background: #6a1a00; }
+    button:active { transform: scale(0.95); }
+    button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .bosses {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      max-width: 560px;
+      width: 100%;
+      padding: 0 16px;
+    }
+
+    .boss-btn {
+      width: auto;
+      height: auto;
+      font-size: 11px;
+      padding: 8px 6px;
+      letter-spacing: 0;
+      border-radius: 4px;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .boss-btn.beaten {
+      background: #1a4a00;
+      border-color: #4a8a00;
+      color: #a0ff60;
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+
+    .reset-btn {
+      width: auto;
+      padding: 10px 28px;
+      font-size: 14px;
+      height: auto;
+      letter-spacing: 2px;
+      background: #3a0000;
+      border-color: #8b0000;
+      color: #ff6060;
+    }
+
+    .reset-btn:hover { background: #6a0000; }
+
+    .status {
+      font-size: 13px;
+      color: #806030;
+      letter-spacing: 1px;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cuphead Progress</h1>
+
+  <div class="counter-display" id="display">0</div>
+  <div class="sub">/ 28 Bosses</div>
+
+  <div class="controls">
+    <button id="dec" title="Undo">−</button>
+    <button id="inc" title="Boss Beaten">+</button>
+  </div>
+
+  <div class="bosses" id="bossGrid"></div>
+
+  <button class="reset-btn" id="reset">Reset All</button>
+  <div class="status" id="status"></div>
+
+  <script src="config.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const BOSSES = [
+      // Isle I
+      "The Root Pack", "Goopy Le Grande", "Hilda Berg", "Ribby and Croaks", "Cagney Carnation",
+      // Isle II
+      "Baroness Von Bon Bon", "Beppi the Clown", "Djimmi the Great", "Grim Matchstick", "Wally Warbles",
+      // Isle III
+      "Rumor Honeybottoms", "Captain Brineybeard", "Sally Stageplay", "Dr. Kahl's Robot", "Cala Maria", "Werner Werman", "Phantom Express",
+      // Inkwell Hell
+      "Tipsy Troop", "Chips Bettigan", "Mr. Wheezy", "Pip and Dot", "Hopus Pocus", "Phear Lap", "Pirouletta", "Mangosteen", "Mr. Chimes",
+      "King Dice", "The Devil"
+    ];
+    const TOTAL = BOSSES.length;
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const beatenRef = ref(db, 'cuphead/beaten');
+    const bossesRef = ref(db, 'cuphead/bosses');
+
+    let beaten = 0;
+    let bossState = {};
+
+    function setStatus(msg) {
+      document.getElementById('status').textContent = msg;
+      setTimeout(() => document.getElementById('status').textContent = '', 2000);
+    }
+
+    function updateCount(val) {
+      set(beatenRef, Math.max(0, Math.min(TOTAL, val)));
+    }
+
+    function toggleBoss(index) {
+      const newState = { ...bossState, [index]: !bossState[index] };
+      const count = Object.values(newState).filter(Boolean).length;
+      set(bossesRef, newState);
+      set(beatenRef, count);
+    }
+
+    // Build boss grid
+    const grid = document.getElementById('bossGrid');
+    BOSSES.forEach((name, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'boss-btn';
+      btn.textContent = name;
+      btn.id = `boss-${i}`;
+      btn.onclick = () => toggleBoss(i);
+      grid.appendChild(btn);
+    });
+
+    onValue(beatenRef, (snap) => {
+      beaten = snap.val() ?? 0;
+      document.getElementById('display').textContent = beaten;
+      document.getElementById('dec').disabled = beaten <= 0;
+      document.getElementById('inc').disabled = beaten >= TOTAL;
+    });
+
+    onValue(bossesRef, (snap) => {
+      bossState = snap.val() ?? {};
+      BOSSES.forEach((_, i) => {
+        const btn = document.getElementById(`boss-${i}`);
+        if (bossState[i]) btn.classList.add('beaten');
+        else btn.classList.remove('beaten');
+      });
+    });
+
+    document.getElementById('inc').onclick = () => { updateCount(beaten + 1); setStatus('Boss defeated!'); };
+    document.getElementById('dec').onclick = () => { updateCount(beaten - 1); setStatus('Undone.'); };
+    document.getElementById('reset').onclick = () => {
+      if (!confirm('Reset all progress?')) return;
+      set(beatenRef, 0);
+      set(bossesRef, {});
+      setStatus('Progress reset.');
+    };
+  </script>
+</body>
+</html>
