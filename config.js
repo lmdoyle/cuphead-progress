@@ -1,5 +1,5 @@
 // Replace with your Firebase project credentials
-const firebaseConfig = {
+var firebaseConfig = {
   apiKey: "AIzaSyAbFxcdfukrkBU8EkHI4_HefhXMetRnk3w",
   authDomain: "cuphead-progress.firebaseapp.com",
   databaseURL: "https://cuphead-progress-default-rtdb.firebaseio.com",
