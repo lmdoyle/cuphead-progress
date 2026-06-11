@@ -11,12 +11,11 @@
       background: #1a0a00;
       font-family: 'Georgia', serif;
       color: #ffd040;
+      padding: 32px 16px 64px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      gap: 32px;
+      gap: 28px;
     }
 
     h1 {
@@ -24,82 +23,116 @@
       letter-spacing: 4px;
       text-transform: uppercase;
       text-shadow: 0 0 10px rgba(255, 208, 64, 0.6);
+      margin-top: 8px;
     }
 
-    .counter-display {
-      font-size: 72px;
+    .totals {
+      display: flex;
+      gap: 40px;
+      align-items: flex-end;
+    }
+
+    .total-block {
+      text-align: center;
+    }
+
+    .total-num {
+      font-size: 56px;
       font-weight: bold;
       color: #fff;
       text-shadow: 0 0 20px rgba(255, 90, 31, 0.8), 2px 2px 0 #8b1a00;
       line-height: 1;
     }
 
-    .sub {
-      font-size: 18px;
+    .total-label {
+      font-size: 12px;
       color: #c87030;
       letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 4px;
     }
 
-    .controls {
-      display: flex;
-      gap: 24px;
-      align-items: center;
+    .divider {
+      font-size: 40px;
+      color: #4a1a00;
+      padding-bottom: 8px;
     }
 
-    button {
-      width: 64px;
-      height: 64px;
-      font-size: 32px;
-      font-weight: bold;
-      border: 3px solid #8b1a00;
-      border-radius: 8px;
-      background: #3a0d00;
+    .section {
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #c87030;
+      border-bottom: 1px solid #3a1a00;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .grid.runguns {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .item-btn {
+      font-family: 'Georgia', serif;
+      font-size: 11px;
+      padding: 10px 8px;
+      border: 2px solid #8b1a00;
+      border-radius: 5px;
+      background: #2a0a00;
       color: #ffd040;
       cursor: pointer;
       transition: background 0.15s, transform 0.1s;
-    }
-
-    button:hover { background: #6a1a00; }
-    button:active { transform: scale(0.95); }
-    button:disabled { opacity: 0.3; cursor: not-allowed; }
-
-    .bosses {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      max-width: 560px;
-      width: 100%;
-      padding: 0 16px;
-    }
-
-    .boss-btn {
-      width: auto;
-      height: auto;
-      font-size: 11px;
-      padding: 8px 6px;
-      letter-spacing: 0;
-      border-radius: 4px;
-      line-height: 1.3;
       text-align: center;
+      line-height: 1.4;
     }
 
-    .boss-btn.beaten {
-      background: #1a4a00;
-      border-color: #4a8a00;
-      color: #a0ff60;
+    .item-btn:hover { background: #4a1200; }
+    .item-btn:active { transform: scale(0.96); }
+
+    .item-btn.done {
+      background: #0d2a00;
+      border-color: #3a6a00;
+      color: #80c040;
       text-decoration: line-through;
-      opacity: 0.7;
+      opacity: 0.65;
+    }
+
+    .item-btn.rungun-btn {
+      border-color: #1a4a8b;
+      background: #00102a;
+      color: #60c0ff;
+    }
+
+    .item-btn.rungun-btn:hover { background: #001a3a; }
+
+    .item-btn.rungun-btn.done {
+      background: #001a2a;
+      border-color: #006a8b;
+      color: #40a0c0;
     }
 
     .reset-btn {
-      width: auto;
+      font-family: 'Georgia', serif;
       padding: 10px 28px;
-      font-size: 14px;
-      height: auto;
+      font-size: 13px;
       letter-spacing: 2px;
       background: #3a0000;
-      border-color: #8b0000;
+      border: 2px solid #8b0000;
+      border-radius: 6px;
       color: #ff6060;
+      cursor: pointer;
+      text-transform: uppercase;
     }
 
     .reset-btn:hover { background: #6a0000; }
@@ -115,15 +148,24 @@
 <body>
   <h1>Cuphead Progress</h1>
 
-  <div class="counter-display" id="display">0</div>
-  <div class="sub">/ 28 Bosses</div>
-
-  <div class="controls">
-    <button id="dec" title="Undo">−</button>
-    <button id="inc" title="Boss Beaten">+</button>
+  <div class="totals">
+    <div class="total-block">
+      <div class="total-num" id="bossCount">0</div>
+      <div class="total-label">/ 28 Bosses</div>
+    </div>
+    <div class="divider">+</div>
+    <div class="total-block">
+      <div class="total-num" id="rgCount">0</div>
+      <div class="total-label">/ 6 Run &amp; Guns</div>
+    </div>
+    <div class="divider">=</div>
+    <div class="total-block">
+      <div class="total-num" id="totalCount">0</div>
+      <div class="total-label">/ 34 Total</div>
+    </div>
   </div>
 
-  <div class="bosses" id="bossGrid"></div>
+  <div id="sections"></div>
 
   <button class="reset-btn" id="reset">Reset All</button>
   <div class="status" id="status"></div>
@@ -133,76 +175,138 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    const BOSSES = [
-      // Isle I
-      "The Root Pack", "Goopy Le Grande", "Hilda Berg", "Ribby and Croaks", "Cagney Carnation",
-      // Isle II
-      "Baroness Von Bon Bon", "Beppi the Clown", "Djimmi the Great", "Grim Matchstick", "Wally Warbles",
-      // Isle III
-      "Rumor Honeybottoms", "Captain Brineybeard", "Sally Stageplay", "Dr. Kahl's Robot", "Cala Maria", "Werner Werman", "Phantom Express",
-      // Inkwell Hell
-      "Tipsy Troop", "Chips Bettigan", "Mr. Wheezy", "Pip and Dot", "Hopus Pocus", "Phear Lap", "Pirouletta", "Mangosteen", "Mr. Chimes",
-      "King Dice", "The Devil"
+    const SECTIONS = [
+      {
+        title: "Inkwell Isle I — Bosses",
+        key: "bosses",
+        items: ["The Root Pack", "Goopy Le Grande", "Hilda Berg", "Ribby and Croaks", "Cagney Carnation"],
+        offset: 0,
+        type: "boss"
+      },
+      {
+        title: "Inkwell Isle II — Bosses",
+        key: "bosses",
+        items: ["Baroness Von Bon Bon", "Beppi the Clown", "Djimmi the Great", "Grim Matchstick", "Wally Warbles"],
+        offset: 5,
+        type: "boss"
+      },
+      {
+        title: "Inkwell Isle III — Bosses",
+        key: "bosses",
+        items: ["Rumor Honeybottoms", "Captain Brineybeard", "Sally Stageplay", "Dr. Kahl's Robot", "Cala Maria", "Werner Werman", "Phantom Express"],
+        offset: 10,
+        type: "boss"
+      },
+      {
+        title: "Inkwell Hell — Bosses",
+        key: "bosses",
+        items: ["Tipsy Troop", "Chips Bettigan", "Mr. Wheezy", "Pip and Dot", "Hopus Pocus", "Phear Lap", "Pirouletta", "Mangosteen", "Mr. Chimes", "King Dice", "The Devil"],
+        offset: 17,
+        type: "boss"
+      },
+      {
+        title: "Run & Gun Levels",
+        key: "runguns",
+        items: ["Forest Follies", "Treetop Trouble", "Funhouse Frazzle", "Funfair Fever", "Rugged Ridge", "Perilous Piers"],
+        offset: 0,
+        type: "rungun"
+      }
     ];
-    const TOTAL = BOSSES.length;
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const beatenRef = ref(db, 'cuphead/beaten');
     const bossesRef = ref(db, 'cuphead/bosses');
+    const rungRef = ref(db, 'cuphead/runguns');
+    const totalRef = ref(db, 'cuphead/total');
 
-    let beaten = 0;
     let bossState = {};
+    let rgState = {};
 
     function setStatus(msg) {
       document.getElementById('status').textContent = msg;
       setTimeout(() => document.getElementById('status').textContent = '', 2000);
     }
 
-    function updateCount(val) {
-      set(beatenRef, Math.max(0, Math.min(TOTAL, val)));
+    function syncCounts() {
+      const bc = Object.values(bossState).filter(Boolean).length;
+      const rc = Object.values(rgState).filter(Boolean).length;
+      document.getElementById('bossCount').textContent = bc;
+      document.getElementById('rgCount').textContent = rc;
+      document.getElementById('totalCount').textContent = bc + rc;
+      set(totalRef, bc + rc);
     }
 
-    function toggleBoss(index) {
-      const newState = { ...bossState, [index]: !bossState[index] };
-      const count = Object.values(newState).filter(Boolean).length;
-      set(bossesRef, newState);
-      set(beatenRef, count);
+    function toggle(section, index) {
+      if (section.type === 'boss') {
+        bossState = { ...bossState, [section.offset + index]: !bossState[section.offset + index] };
+        set(bossesRef, bossState);
+      } else {
+        rgState = { ...rgState, [index]: !rgState[index] };
+        set(rungRef, rgState);
+      }
+      syncCounts();
     }
 
-    // Build boss grid
-    const grid = document.getElementById('bossGrid');
-    BOSSES.forEach((name, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'boss-btn';
-      btn.textContent = name;
-      btn.id = `boss-${i}`;
-      btn.onclick = () => toggleBoss(i);
-      grid.appendChild(btn);
-    });
+    // Build sections
+    const container = document.getElementById('sections');
+    SECTIONS.forEach((section, si) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'section';
 
-    onValue(beatenRef, (snap) => {
-      beaten = snap.val() ?? 0;
-      document.getElementById('display').textContent = beaten;
-      document.getElementById('dec').disabled = beaten <= 0;
-      document.getElementById('inc').disabled = beaten >= TOTAL;
+      const title = document.createElement('div');
+      title.className = 'section-title';
+      title.textContent = section.title;
+      wrap.appendChild(title);
+
+      const grid = document.createElement('div');
+      grid.className = section.type === 'rungun' ? 'grid runguns' : 'grid';
+      wrap.appendChild(grid);
+
+      section.items.forEach((name, i) => {
+        const btn = document.createElement('button');
+        btn.className = section.type === 'rungun' ? 'item-btn rungun-btn' : 'item-btn';
+        btn.textContent = name;
+        btn.id = `${section.key}-${section.offset + i}`;
+        btn.onclick = () => toggle(section, i);
+        grid.appendChild(btn);
+      });
+
+      container.appendChild(wrap);
     });
 
     onValue(bossesRef, (snap) => {
       bossState = snap.val() ?? {};
-      BOSSES.forEach((_, i) => {
-        const btn = document.getElementById(`boss-${i}`);
-        if (bossState[i]) btn.classList.add('beaten');
-        else btn.classList.remove('beaten');
+      SECTIONS.filter(s => s.type === 'boss').forEach(section => {
+        section.items.forEach((_, i) => {
+          const btn = document.getElementById(`bosses-${section.offset + i}`);
+          if (!btn) return;
+          if (bossState[section.offset + i]) btn.classList.add('done');
+          else btn.classList.remove('done');
+        });
       });
+      syncCounts();
     });
 
-    document.getElementById('inc').onclick = () => { updateCount(beaten + 1); setStatus('Boss defeated!'); };
-    document.getElementById('dec').onclick = () => { updateCount(beaten - 1); setStatus('Undone.'); };
+    onValue(rungRef, (snap) => {
+      rgState = snap.val() ?? {};
+      SECTIONS.filter(s => s.type === 'rungun').forEach(section => {
+        section.items.forEach((_, i) => {
+          const btn = document.getElementById(`runguns-${i}`);
+          if (!btn) return;
+          if (rgState[i]) btn.classList.add('done');
+          else btn.classList.remove('done');
+        });
+      });
+      syncCounts();
+    });
+
     document.getElementById('reset').onclick = () => {
       if (!confirm('Reset all progress?')) return;
-      set(beatenRef, 0);
       set(bossesRef, {});
+      set(rungRef, {});
+      set(totalRef, 0);
+      bossState = {};
+      rgState = {};
       setStatus('Progress reset.');
     };
   </script>

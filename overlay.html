@@ -84,10 +84,10 @@
 </head>
 <body>
   <div class="widget">
-    <div class="title">Bosses Defeated</div>
+    <div class="title">Levels Complete</div>
     <div class="bar-track">
       <div class="bar-fill" id="bar"></div>
-      <div class="bar-label" id="label">0 / 28</div>
+      <div class="bar-label" id="label">0 / 34</div>
     </div>
   </div>
 
@@ -96,11 +96,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    const TOTAL = 28;
+    const TOTAL = 34;
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    onValue(ref(db, 'cuphead/beaten'), (snap) => {
+    onValue(ref(db, 'cuphead/total'), (snap) => {
       const beaten = snap.val() ?? 0;
       document.getElementById('bar').style.width = `${(beaten / TOTAL) * 100}%`;
       document.getElementById('label').textContent = `${beaten} / ${TOTAL}`;
