@@ -122,6 +122,20 @@
       color: #40a0c0;
     }
 
+    .item-btn.mausoleum-btn {
+      border-color: #6a1a8b;
+      background: #1a002a;
+      color: #d080ff;
+    }
+
+    .item-btn.mausoleum-btn:hover { background: #2a0040; }
+
+    .item-btn.mausoleum-btn.done {
+      background: #1a002a;
+      border-color: #8b006a;
+      color: #a040c0;
+    }
+
     .reset-btn {
       font-family: 'Georgia', serif;
       padding: 10px 28px;
@@ -158,10 +172,15 @@
       <div class="total-num" id="rgCount">0</div>
       <div class="total-label">/ 6 Run &amp; Guns</div>
     </div>
+    <div class="divider">+</div>
+    <div class="total-block">
+      <div class="total-num" id="mCount">0</div>
+      <div class="total-label">/ 3 Mausoleums</div>
+    </div>
     <div class="divider">=</div>
     <div class="total-block">
       <div class="total-num" id="totalCount">0</div>
-      <div class="total-label">/ 34 Total</div>
+      <div class="total-label">/ 37 Total</div>
     </div>
   </div>
 
@@ -210,6 +229,13 @@
         items: ["Forest Follies", "Treetop Trouble", "Funhouse Frazzle", "Funfair Fever", "Rugged Ridge", "Perilous Piers"],
         offset: 0,
         type: "rungun"
+      },
+      {
+        title: "Mausoleums",
+        key: "mausoleums",
+        items: ["Mausoleum I", "Mausoleum II", "Mausoleum III"],
+        offset: 0,
+        type: "mausoleum"
       }
     ];
 
@@ -217,10 +243,12 @@
     const db = getDatabase(app);
     const bossesRef = ref(db, 'cuphead/bosses');
     const rungRef = ref(db, 'cuphead/runguns');
+    const mausRef = ref(db, 'cuphead/mausoleums');
     const totalRef = ref(db, 'cuphead/total');
 
     let bossState = {};
     let rgState = {};
+    let mausState = {};
 
     function setStatus(msg) {
       document.getElementById('status').textContent = msg;
@@ -230,19 +258,24 @@
     function syncCounts() {
       const bc = Object.values(bossState).filter(Boolean).length;
       const rc = Object.values(rgState).filter(Boolean).length;
+      const mc = Object.values(mausState).filter(Boolean).length;
       document.getElementById('bossCount').textContent = bc;
       document.getElementById('rgCount').textContent = rc;
-      document.getElementById('totalCount').textContent = bc + rc;
-      set(totalRef, bc + rc);
+      document.getElementById('mCount').textContent = mc;
+      document.getElementById('totalCount').textContent = bc + rc + mc;
+      set(totalRef, bc + rc + mc);
     }
 
     function toggle(section, index) {
       if (section.type === 'boss') {
         bossState = { ...bossState, [section.offset + index]: !bossState[section.offset + index] };
         set(bossesRef, bossState);
-      } else {
+      } else if (section.type === 'rungun') {
         rgState = { ...rgState, [index]: !rgState[index] };
         set(rungRef, rgState);
+      } else {
+        mausState = { ...mausState, [index]: !mausState[index] };
+        set(mausRef, mausState);
       }
       syncCounts();
     }
@@ -259,12 +292,12 @@
       wrap.appendChild(title);
 
       const grid = document.createElement('div');
-      grid.className = section.type === 'rungun' ? 'grid runguns' : 'grid';
+      grid.className = section.type === 'rungun' ? 'grid runguns' : section.type === 'mausoleum' ? 'grid runguns' : 'grid';
       wrap.appendChild(grid);
 
       section.items.forEach((name, i) => {
         const btn = document.createElement('button');
-        btn.className = section.type === 'rungun' ? 'item-btn rungun-btn' : 'item-btn';
+        btn.className = section.type === 'rungun' ? 'item-btn rungun-btn' : section.type === 'mausoleum' ? 'item-btn mausoleum-btn' : 'item-btn';
         btn.textContent = name;
         btn.id = `${section.key}-${section.offset + i}`;
         btn.onclick = () => toggle(section, i);
@@ -300,13 +333,28 @@
       syncCounts();
     });
 
+    onValue(mausRef, (snap) => {
+      mausState = snap.val() ?? {};
+      SECTIONS.filter(s => s.type === 'mausoleum').forEach(section => {
+        section.items.forEach((_, i) => {
+          const btn = document.getElementById(`mausoleums-${i}`);
+          if (!btn) return;
+          if (mausState[i]) btn.classList.add('done');
+          else btn.classList.remove('done');
+        });
+      });
+      syncCounts();
+    });
+
     document.getElementById('reset').onclick = () => {
       if (!confirm('Reset all progress?')) return;
       set(bossesRef, {});
       set(rungRef, {});
+      set(mausRef, {});
       set(totalRef, 0);
       bossState = {};
       rgState = {};
+      mausState = {};
       setStatus('Progress reset.');
     };
   </script>
