@@ -1,10 +1,11 @@
 // Replace with your Firebase project credentials
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAbFxcdfukrkBU8EkHI4_HefhXMetRnk3w",
+  authDomain: "cuphead-progress.firebaseapp.com",
+  databaseURL: "https://cuphead-progress-default-rtdb.firebaseio.com",
+  projectId: "cuphead-progress",
+  storageBucket: "cuphead-progress.firebasestorage.app",
+  messagingSenderId: "486127433177",
+  appId: "1:486127433177:web:1a9a040dbcec853f3ad5c8"
 };
+
